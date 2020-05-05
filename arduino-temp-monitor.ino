@@ -20,10 +20,10 @@ const long tempSensorR0 = 100000;            // R0 = 100k
 
 /*macro definitions of Rotary angle sensor and LED pin*/
 const int pinRotaryAngleSensor = A1;
-const int rotarySensorAngleMin = 0;
-const int rotarySensorAngleMax = 300; //full value of the rotary angle is 300 degrees
-const int voltageADC_ref = 5; //reference voltage of ADC is 5v.If the Vcc switch on the seeeduino board switches to 3V3, the ADC_REF should be 3.3
-const int voltageGrove_VCC = 5; //VCC of the grove interface is normally 5v
+const int rotarySensorMin = 0;
+const int rotarySensorMax = 1023; //max value of the rotary sensor
+const float voltageADC_ref = 5; //reference voltage of ADC is 5v.If the Vcc switch on the seeeduino board switches to 3V3, the ADC_REF should be 3.3
+const float voltageGrove_VCC = 5; //VCC of the grove interface is normally 5v
 
 
 const int pinLightSensor = A2;
@@ -124,11 +124,11 @@ void loop() {
   tempAmbient = temperature*tempPrecision;
 
   //check the value of rotary knob to adjust Set temperature
-  float voltage;
   int sensor_value = analogRead(pinRotaryAngleSensor);
-  voltage = (float)sensor_value*voltageADC_ref/1023;
-  int degrees = (voltage*rotarySensorAngleMax)/voltageGrove_VCC;
-  tempSet = map(degrees, rotarySensorAngleMax, rotarySensorAngleMin, tempSetMin, tempSetMax);
+  if (voltageADC_ref!=voltageGrove_VCC){
+    sensor_value*voltageADC_ref/voltageGrove_VCC;
+  }
+  tempSet = map(sensor_value, rotarySensorMax, rotarySensorMin, tempSetMin, tempSetMax);
 
 
   tempWater = 250;
