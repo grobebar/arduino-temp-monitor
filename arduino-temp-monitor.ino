@@ -36,6 +36,9 @@ const int pinSwitch =  4;      // the number of the LED pin
 const int pinWaterTemp = 8;     // the number of the pushbutton pin
 OneWire oneWire(pinWaterTemp); // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs) 
 DallasTemperature sensors(&oneWire); // Pass our oneWire reference to Dallas Temperature. 
+DeviceAddress tempDeviceAddress;
+DeviceAddress* myArray = 0;
+
 
 unsigned long timeStart = 0;
 unsigned long timeElapsed = 0;
@@ -52,6 +55,9 @@ const int tempSetMax=350;
 int tempSet=0;
 int tempWater = 0;
 int tempAmbient = 0;
+int digitalTempDelayInMillis = 0;
+int digitalTempResolution = 12; // for digital temperature sensor
+unsigned long digitalTempLastRequest = 0;
 
 
 //from: https://maxpromer.github.io/LCD-Character-Creator/
@@ -77,7 +83,22 @@ void setup() {
 
 
   // Start up the sensors library for DS18B20 temperature sensor
-  //sensors.begin();
+  sensors.begin();
+  int digitalTempSensors = sensors.getDeviceCount();
+  
+  myArray = new DeviceAddress [digitalTempSensors];
+  Serial.println(sizeof(myArray) / sizeof(int));
+  snprintf(lcdBuffer, lcdBufferLength, "Found %d DS18...", digitalTempSensors);
+  lcd.setCursor(0, 1);
+  lcd.print(lcdBuffer);
+
+  sensors.getAddress(tempDeviceAddress, 0);
+  sensors.setResolution(tempDeviceAddress, digitalTempResolution);
+  //digitalTempDelayInMillis = 750 / (1 << (12 - digitalTempResolution)); 
+  digitalTempDelayInMillis = sensors.millisToWaitForConversion(digitalTempResolution); 
+  sensors.setWaitForConversion(false);
+  sensors.requestTemperatures();
+  digitalTempLastRequest = millis(); 
   //more code from: https://create.arduino.cc/projecthub/TheGadgetBoy/ds18b20-digital-temperature-sensor-and-arduino-9cc806
   // and here: https://create.arduino.cc/projecthub/iotboys/how-to-use-ds18b20-water-proof-temperature-sensor-2adecc
   
@@ -121,8 +142,12 @@ void loop() {
   tempSet = map(sensor_value, analogMax, analogMin, tempSetMin, tempSetMax);
 
 
-  tempWater = 260;
-
+  //tempWater = 260;
+  if (millis() - digitalTempLastRequest >= digitalTempDelayInMillis){
+    tempWater = sensors.getTempC(tempDeviceAddress) * tempPrecision;
+    sensors.requestTemperatures(); 
+    digitalTempLastRequest = millis(); 
+  }
   
   //set the swtitch to correct state and adjust LCD backlight
   if (tempWater<tempSet){
