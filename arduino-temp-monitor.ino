@@ -19,10 +19,10 @@ const int analogMin = 0;
 const int analogMax = 1023; //max value of the analog read
 
 // Grove - Temperature Sensor V1.2 - https://wiki.seeedstudio.com/Grove-Temperature_Sensor_V1.2/
-const int pinTempSensor = A0;     // Grove - Temperature Sensor connect to A0
+const int pinTempSensor = A1;     // Grove - Temperature Sensor connect to A0
 
 // Grove - Rotary Angle Sensor - https://wiki.seeedstudio.com/Grove-Rotary_Angle_Sensor/
-const int pinRotaryAngleSensor = A1;
+const int pinRotaryAngleSensor = A0;
 
 // Grove - Light Sensor - https://wiki.seeedstudio.com/Grove-Light_Sensor/
 const int pinLightSensor = A2;
@@ -30,10 +30,10 @@ const int pinLightSensor = A2;
 
 
 //Digital inputs
-const int pinButton = 2;     // the number of the pushbutton pin
-const int pinTouch = 3;     // the number of the touch pin
+const int pinButton = 8;     // the number of the pushbutton pin
+const int pinTouch = 5;     // the number of the touch pin
 const int pinSwitch =  4;      // the number of the LED pin
-const int pinWaterTemp = 8;     // the number of the pushbutton pin
+const int pinWaterTemp = 2;     // the number of the pushbutton pin
 OneWire oneWire(pinWaterTemp); // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs) 
 DallasTemperature sensors(&oneWire); // Pass our oneWire reference to Dallas Temperature. 
 DeviceAddress tempDeviceAddress;
